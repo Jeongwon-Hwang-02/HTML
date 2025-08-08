@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookmark Page</title>
+  <link rel="icon" href="https://img.icons8.com/fluency/32/star.png" type="image/png">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .section {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.3em;
+      margin-top: 30px;
+      color: #444;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #0077cc;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: #004a99;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 8px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      width: 70%;
+      font-size: 1em;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 8px 12px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .delete {
+      color: red;
+      font-size: 0.9em;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    #clock {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #555;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #greeting {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #555;
+      margin: 10px 0 20px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📁 자주 사용하는 사이트 모음집</h1>
+    <p id="greeting"></p>
+    <p style="font-size: 1.05em; color: #555; text-align: center;">
+      안녕하세요 😊<br>
+      자주 방문하는 사이트, 오늘 할 일, 메모장을 한 곳에 정리했어요.<br>
+      모든 정보는 자동 저장됩니다.
+    </p>
+
+    <!-- 인터넷 검색 -->
+    <div class="section">
+      <h2>🔍 인터넷 검색</h2>
+      <ul>
+        <li><a href="https://www.naver.com" target="_blank">Go to <strong>"Naver"</strong> site</a></li>
+        <li><a href="https://www.youtube.com" target="_blank">Go to <strong>"YouTube"</strong> site</a></li>
+      </ul>
+    </div>
+
+    <!-- 코딩 공부 -->
+    <div class="section">
+      <h2>💻 코딩 공부</h2>
+      <ul>
+        <li><a href="https://www.notion.so" target="_blank">Go to <strong>"Notion"</strong> site</a></li>
+        <li><a href="https://opentutorials.org/course/1" target="_blank">Go to <strong>"생활코딩"</strong> site</a></li>
+        <li><a href="https://chatgpt.com/" target="_blank">Go to <strong>"ChatGPT"</strong> site</a></li>
+      </ul>
+    </div>
+
+    <!-- 할 일 리스트 -->
+    <div class="section">
+      <h2>📝 오늘의 할 일</h2>
+      <div>
+        <input type="text" id="todo-input" placeholder="할 일을 입력하세요">
+        <button onclick="addTodo()">추가</button>
+      </div>
+      <ul id="todo-list"></ul>
+    </div>
+
+    <!-- 메모장 -->
+    <div class="section">
+      <h2>🗒️ 자유 메모장</h2>
+      <textarea id="memo" placeholder="메모를 입력하세요..."></textarea>
+    </div>
+
+    <!-- 시계 -->
+    <div id="clock"></div>
+  </div>
+
+  <script>
+    // 인삿말 + 시계
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleString("ko-KR", { hour12: false });
+      document.getElementById("clock").textContent = "현재 시간: " + timeString;
+
+      const hour = now.getHours();
+      let greeting = "좋은 하루 되세요!";
+      if (hour < 12) greeting = "좋은 아침입니다! ☀️";
+      else if (hour < 18) greeting = "좋은 오후입니다! 🌤️";
+      else greeting = "좋은 저녁입니다! 🌙";
+      document.getElementById("greeting").textContent = greeting;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 할 일 리스트
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo-list');
+    let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+
+    function renderTodos() {
+      todoList.innerHTML = '';
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = todo.done;
+        checkbox.addEventListener('change', () => {
+          todos[index].done = checkbox.checked;
+          saveTodos();
+          renderTodos();
+        });
+
+        const span = document.createElement('span');
+        span.textContent = todo.text;
+        if (todo.done) span.style.textDecoration = 'line-through';
+
+        const del = document.createElement('span');
+        del.textContent = '🗑️';
+        del.className = 'delete';
+        del.addEventListener('click', () => {
+          todos.splice(index, 1);
+          saveTodos();
+          renderTodos();
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(del);
+        todoList.appendChild(li);
+      });
+    }
+
+    function saveTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    function addTodo() {
+      const text = todoInput.value.trim();
+      if (text !== '') {
+        todos.push({ text: text, done: false });
+        saveTodos();
+        renderTodos();
+        todoInput.value = '';
+      }
+    }
+
+    renderTodos();
+
+    // 자유 메모장 자동 저장
+    const memoArea = document.getElementById('memo');
+    memoArea.value = localStorage.getItem('memo') || '';
+    memoArea.addEventListener('input', () => {
+      localStorage.setItem('memo', memoArea.value);
+    });
+  </script>
+
+</body>
+</html>
